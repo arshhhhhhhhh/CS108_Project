@@ -21,7 +21,11 @@ login_user () {
             break;
         fi
     done
-    if [ $us_f -eq 0 ]; then
+    if [ "$1" == "2" ] && [ ${users["user1"]} == "$usr" ]; then
+        echo "User $1: $usr is already logged in. Please use a different username."
+        login_user $1
+    fi
+    elif [ $us_f -eq 0 ]; then
         read -p "Given username does not exist. Do you want to create new user? (y/n) " ch
         if [ $ch == "y" ]; then
             register_user $1
