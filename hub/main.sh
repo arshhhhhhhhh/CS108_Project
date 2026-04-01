@@ -15,17 +15,21 @@ login_user () {
     done < users.tsv
     us_f=0;
     for ((i=0; i<index; i++)); do
-        if [ $usr == ${tsvd_usr[$i]} ]; then
+        if [ "$usr" == "${tsvd_usr[$i]}" ]; then
             us_f=1;
             ps_f=${tsvd_psd[$i]};
             break;
         fi
     done
+    if [ "$usr" == "" ] || [ "$psd" == "" ]; then
+        echo "Username and password cannot be empty. Please try again."
+        login_user $1
+    fi
     if [ "$1" == "2" ] && [ ${users["user1"]} == "$usr" ]; then
         echo "User $1: $usr is already logged in. Please use a different username."
         login_user $1
     fi
-    elif [ $us_f -eq 0 ]; then
+    if [ $us_f -eq 0 ]; then
         read -p "Given username does not exist. Do you want to create new user? (y/n) " ch
         if [ $ch == "y" ]; then
             register_user $1
