@@ -22,3 +22,4 @@ class Game:
             return self.player2
     def check_win(self):
         pass
+game = Game(3, player1, player2)
