@@ -22,4 +22,40 @@ class Game:
             return self.player2
     def check_win(self):
         pass
-game = Game(3, player1, player2)
+
+pygame.init()
+screen = pygame.display.set_mode((1470, 956))
+pygame.display.set_caption("Welcome to GameSphere Hub: " + player1 + " vs " + player2)
+menu_bg = pygame.image.load('images/menu.png').convert()
+menu_bg = pygame.transform.scale(menu_bg, (1470, 956))
+tictactoe_button = pygame.image.load('images/play_tictactoe.png').convert_alpha()
+tictactoe_rect = tictactoe_button.get_rect()
+tictactoe_rect.bottomleft = (105, 830)
+othello_button = pygame.image.load('images/play_othello.png').convert_alpha()
+othello_rect = othello_button.get_rect()
+othello_rect.bottomleft = (560, 830)
+connect4_button = pygame.image.load('images/play_connect4.png').convert_alpha()
+connect4_rect = connect4_button.get_rect()
+connect4_rect.bottomleft = (1015, 830)
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+    screen.blit(menu_bg, (0, 0))
+    screen.blit(tictactoe_button, tictactoe_rect)
+    screen.blit(othello_button, othello_rect)
+    screen.blit(connect4_button, connect4_rect)
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if tictactoe_rect.collidepoint(event.pos):
+            print("Starting Tic Tac Toe game...")
+            # Start Tic Tac Toe game
+        elif othello_rect.collidepoint(event.pos):
+            print("Starting Othello game...")
+            # Start Othello game
+        elif connect4_rect.collidepoint(event.pos):
+            print("Starting Connect 4 game...")
+            # Start Connect 4 game
+    pygame.display.update()
+

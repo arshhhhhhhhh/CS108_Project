@@ -1,0 +1,60 @@
+# =========================
+# Python virtual environment
+# =========================
+venv/
+.venv/
+env/
+
+# =========================
+# Python cache / artifacts
+# =========================
+__pycache__/
+__pycache__
+*.py[cod]
+*$py.class
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Python packaging
+# =========================
+build/
+install/
+log/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Logs & runtime files
+# =========================
+*.log
+*.out
+*.err
+*.pid
+
+# =========================
+# OS / editor junk
+# =========================
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# =========================
+# VS Code (keep settings optional)
+# =========================
+.vscode/
+!.vscode/settings.json
+
+# =========================
+# Environment variables / secrets
+# =========================
+.env
+.env.*
+
+hub/users.tsv
