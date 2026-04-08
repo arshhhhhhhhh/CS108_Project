@@ -1,8 +1,14 @@
+import os
 import sys
+
+sys.path.append(os.path.join(sys.path[0], 'games'))
+
 import numpy as np
 import pygame
+
 player1 = sys.argv[1]
 player2 = sys.argv[2]
+
 class Game:
     def __init__(self, n, player1, player2):
         self.player1 = player1
@@ -22,4 +28,9 @@ class Game:
             return self.player2
     def check_win(self):
         pass
+
 game = Game(3, player1, player2)
+
+from games import connect4
+from games import tictactoe
+from games import othello
