@@ -12,6 +12,7 @@ class Game:
         self.board_size = n
         self.board = np.zeros((self.board_size, self.board_size))
         self.result = -1
+        self.appended = 0
     def load_assets(self, screen):
         self.screen = screen
         self.turn_images = {1: pygame.image.load('images/player1_turn.png').convert_alpha(),
@@ -32,18 +33,22 @@ class Game:
     def check_win(self):
         pass
 
+def get_rect(pos, rect):
+    for r in rect:
+        if r.collidepoint(pos):
+            return r
+    return None
+
 def main_menu(player1, player2, screen, clock):
-    menu_bg = pygame.image.load('images/main_menu/menu.png').convert()
-    menu_bg = pygame.transform.scale(menu_bg, (1470, 956))
-    tictactoe_button = pygame.image.load('images/main_menu/play_tictactoe.png').convert_alpha()
-    tictactoe_rect = tictactoe_button.get_rect()
-    tictactoe_rect.bottomleft = (105, 830)
-    othello_button = pygame.image.load('images/main_menu/play_othello.png').convert_alpha()
-    othello_rect = othello_button.get_rect()
-    othello_rect.bottomleft = (560, 830)
-    connect4_button = pygame.image.load('images/main_menu/play_connect4.png').convert_alpha()
-    connect4_rect = connect4_button.get_rect()
-    connect4_rect.bottomleft = (1015, 830)
+    menu_bg = pygame.image.load('images/menu.png').convert()
+    #menu_bg = pygame.transform.scale(menu_bg, (1470, 956))
+    tictactoe_rect = pygame.Rect(105, 340, 350, 345)
+    othello_rect = pygame.Rect(560, 340, 350, 345)
+    connect4_rect = pygame.Rect(1015, 340, 350, 345)
+    switch_turn_rect = pygame.Rect(105, 725, 350, 105)
+    leaderboard_rect = pygame.Rect(560, 725, 350, 105)
+    exit_rect = pygame.Rect(1015, 725, 350, 105)
+    rectangles = [tictactoe_rect, othello_rect, connect4_rect, switch_turn_rect, leaderboard_rect, exit_rect]
 
     while True:
         for event in pygame.event.get():
@@ -51,27 +56,48 @@ def main_menu(player1, player2, screen, clock):
                 pygame.quit()
                 sys.exit()
     
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            '''if tictactoe_rect.collidepoint(event.pos):
-                print("Starting Tic Tac Toe game...")
-                # Start Tic Tac Toe game'''
-                
-            if othello_rect.collidepoint(event.pos):
-                print("Starting Othello game...")
-                # Start Othello game
-                from games.othello import othello
-                game = othello(player1, player2, screen)
-                game.start_othello()
-                pygame.event.clear()
-                game = None
-            '''elif connect4_rect.collidepoint(event.pos):
-                print("Starting Connect 4 game...")
-                # Start Connect 4 game'''
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                button = get_rect(event.pos, rectangles)
+                if button == exit_rect:
+                    print("Exiting GameSphere Hub. Goodbye!")
+                    pygame.quit()
+                    sys.exit()
+                elif button == switch_turn_rect:
+                    print("Switching turns between players...")
+                    player1, player2 = player2, player1
+                    pygame.display.set_caption("Welcome to GameSphere Hub: " + player1 + " vs " + player2)
+                    continue
+                elif button == leaderboard_rect:
+                    print("Displaying leaderboard...")
+                    # Display leaderboard (not implemented in this code snippet)
+                    continue
+                elif button == tictactoe_rect:
+                    print("Starting Tic Tac Toe game...")
+                    # Start Tic Tac Toe game
+                    from games.tictactoe import tictactoe
+                    game = tictactoe(player1, player2, screen)
+                    game.start_tictactoe()
+                    pygame.event.clear()
+                    game = None
+                    continue   
+                elif button == othello_rect:
+                    print("Starting Othello game...")
+                    # Start Othello game
+                    from games.othello import othello
+                    game = othello(player1, player2, screen)
+                    game.start_othello()
+                    pygame.event.clear()
+                    game = None
+                elif button == connect4_rect:
+                    print("Starting Connect 4 game...")
+                    # Start Connect 4 game
+                    from games.connect4 import connect4
+                    game = connect4(player1, player2, screen)
+                    game.start_connect4()
+                    pygame.event.clear()
+                    game = None
         
         screen.blit(menu_bg, (0, 0))
-        screen.blit(tictactoe_button, tictactoe_rect)
-        screen.blit(othello_button, othello_rect)
-        screen.blit(connect4_button, connect4_rect)
         pygame.display.update()
         clock.tick(60)
     
