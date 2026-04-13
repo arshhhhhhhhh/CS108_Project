@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import pygame
-
+from datetime import datetime
 from game import Game
 class othello(Game):
     def __init__(self, player1, player2, screen) -> None:
@@ -199,7 +199,9 @@ class othello(Game):
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.reset_button.collidepoint(event.pos):
                         self.board = np.zeros((self.board_size, self.board_size))
-                        self.set_board()
+                        self.set_board(self.screen)
+                        self.current_player = 1
+                        self.next_player = 2
                         self.update_valid_pos()
                         self.result = -1
                         continue
@@ -216,9 +218,17 @@ class othello(Game):
             if cell is not None:
                 if (cell[0], cell[1]) in [move[0] for move in self.valid_moves]:
                     self.screen.blit(self.discs[self.current_player], self.grid[cell[0]][cell[1]])
-            #if self.result != -1:
-                #print(self.result)
-            pygame.display.update()
+            if self.result != -1 and self.appended == 0:
+                self.appended = 1
+                now = datetime.now()
+                timestamp = now.strftime("%d/%m/%Y")
+                if self.result == 1:
+                    with open('history.csv', 'a') as f:
+                        f.write(f"{self.player1},{self.player2},{timestamp},Othello\n")
+                elif self.result == 2:
+                    with open('history.csv', 'a') as f:
+                        f.write(f"{self.player2},{self.player1},{timestamp},Othello\n")
+            pygame.display.flip()
             clock.tick(60)
                             
                 
