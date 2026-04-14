@@ -39,6 +39,7 @@ class tictactoe(Game):
             self.result = 0
             return
         b = (self.board == self.next_player).astype(int)
+        print(b)
         #horizontal
         row = b[r, :]
         windows = sliding_window_view(row, 5)
@@ -59,34 +60,33 @@ class tictactoe(Game):
             return
         #diagonal1
         diag1 = np.diagonal(b, offset=c-r)
-        if len(diag1) < 5:
-            return
-        windows = sliding_window_view(diag1, 5)
-        sums = windows.sum(axis=1)
-        if np.any(sums == 5):
-            i = np.argmax(sums == 5)
-            if r >= c:
-                self.win_cell = (r-c+i+2, i+2)
-            else:
-                self.win_cell = (i+2, c-r+i+2)
-            self.win_type = "d1"
-            self.result = self.next_player
-            return
+        if len(diag1) >= 5:
+            windows = sliding_window_view(diag1, 5)
+            sums = windows.sum(axis=1)
+            if np.any(sums == 5):
+                i = np.argmax(sums == 5)
+                if r >= c:
+                    self.win_cell = (r-c+i+2, i+2)
+                else:
+                    self.win_cell = (i+2, c-r+i+2)
+                self.win_type = "d1"
+                self.result = self.next_player
+                return
         #diagonal2
         diag2 = np.diagonal(np.fliplr(b), offset=(9-c)-r)
-        if len(diag2) < 4:
-            return
-        windows = sliding_window_view(diag2, 4)
-        sums = windows.sum(axis=1)
-        if np.any(sums == 4):
-            i = np.argmax(sums == 4)
-            if r+c >= 6:
-                self.win_cell = (r+c-9+i+2, 9-i-2)
-            else:
-                self.win_cell = (i+2, r+c-i-2)
-            self.win_type = "d2"
-            self.result = self.next_player
-            return
+        if len(diag2) >= 5:
+            windows = sliding_window_view(diag2, 5)
+            sums = windows.sum(axis=1)
+            if np.any(sums == 5):
+                i = np.argmax(sums == 5)
+                if r+c >= 10:
+                    self.win_cell = (r+c-9+i+2, 9-i-2)
+                else:
+                    self.win_cell = (i+2, r+c-i-2)
+                    print(self.win_cell)
+                self.win_type = "d2"
+                self.result = self.next_player
+                return
 
     def update_board(self, r, c):
         if self.board[r][c] == 0:

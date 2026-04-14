@@ -10,10 +10,10 @@ class othello(Game):
         self.update_valid_pos()
     
     def set_board(self, screen):
-        self.board[3][3] = 1
-        self.board[3][4] = 2
-        self.board[4][3] = 2
-        self.board[4][4] = 1
+        self.board[3][3] = 2
+        self.board[3][4] = 1
+        self.board[4][3] = 1
+        self.board[4][4] = 2
         self.player1_pieces = 2
         self.player2_pieces = 2
         self.load_assets(screen)

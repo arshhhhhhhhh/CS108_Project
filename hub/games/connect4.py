@@ -59,34 +59,32 @@ class connect4(Game):
             return
         #diagonal1
         diag1 = np.diagonal(b, offset=c-r)
-        if len(diag1) < 4:
-            return
-        windows = sliding_window_view(diag1, 4)
-        sums = windows.sum(axis=1)
-        if np.any(sums == 4):
-            i = np.argmax(sums == 4)
-            if r >= c:
-                self.win_cell = (r-c+i+2, i+2)
-            else:
-                self.win_cell = (i+2, c-r+i+2)
-            self.win_type = "d1"
-            self.result = self.next_player
-            return
+        if len(diag1) >= 4:
+            windows = sliding_window_view(diag1, 4)
+            sums = windows.sum(axis=1)
+            if np.any(sums == 4):
+                i = np.argmax(sums == 4)
+                if r >= c:
+                    self.win_cell = (r-c+i+2, i+2)
+                else:
+                    self.win_cell = (i+2, c-r+i+2)
+                self.win_type = "d1"
+                self.result = self.next_player
+                return
         #diagonal2
         diag2 = np.diagonal(np.fliplr(b), offset=(6-c)-r)
-        if len(diag2) < 4:
-            return
-        windows = sliding_window_view(diag2, 4)
-        sums = windows.sum(axis=1)
-        if np.any(sums == 4):
-            i = np.argmax(sums == 4)
-            if r+c >= 6:
-                self.win_cell = (r+c-6+i+2, 6-i-2)
-            else:
-                self.win_cell = (i+2, r+c-i-2)
-            self.win_type = "d2"
-            self.result = self.next_player
-            return
+        if len(diag2) >= 4:
+            windows = sliding_window_view(diag2, 4)
+            sums = windows.sum(axis=1)
+            if np.any(sums == 4):
+                i = np.argmax(sums == 4)
+                if r+c >= 6:
+                    self.win_cell = (r+c-6+i+2, 6-i-2)
+                else:
+                    self.win_cell = (i+2, r+c-i-2)
+                self.win_type = "d2"
+                self.result = self.next_player
+                return
 
     def get_lowest(self, c):
         if c is None:
