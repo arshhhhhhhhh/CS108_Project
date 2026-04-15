@@ -5,9 +5,41 @@ sys.path.append(os.path.join(sys.path[0], 'games'))
 
 import numpy as np
 import pygame
+import csv
+import matplotlib.pyplot as plt
+from collections import Counter
 
 player1 = sys.argv[1]
 player2 = sys.argv[2]
+
+def visualise():
+    with open('history.csv', 'r') as f:
+        reader = csv.reader(f, delimiter=';')
+        winners = []
+        games = []
+        for row in reader:
+            if len(row) == 4:
+                winners.append(row[0])
+                games.append(row[3])
+    
+    win_counts = Counter(winners)
+    top5 = win_counts.most_common(5)
+    if top5:
+        players, counts = zip(*top5)
+        plt.figure(1)
+        plt.bar(players, counts)
+        plt.title('Top 5 Players by Win Count')
+        plt.xlabel('Players')
+        plt.ylabel('Wins')
+    
+    game_counts = Counter(games)
+    if game_counts:
+        labels, sizes = zip(*game_counts.items())
+        plt.figure(2)
+        plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+        plt.title('Most Played Games by Frequency')
+    
+    plt.show()
 
 class Game:
     def __init__(self, n, player1, player2):
@@ -68,3 +100,5 @@ while True:
             print("Starting Connect 4 game...")
             # Start Connect 4 game
     pygame.display.update()
+
+
