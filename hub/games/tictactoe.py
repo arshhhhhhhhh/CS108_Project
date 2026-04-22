@@ -39,7 +39,6 @@ class tictactoe(Game):
             self.result = 0
             return
         b = (self.board == self.next_player).astype(int)
-        print(b)
         #horizontal
         row = b[r, :]
         windows = sliding_window_view(row, 5)
