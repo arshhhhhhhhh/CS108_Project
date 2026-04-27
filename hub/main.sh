@@ -1,12 +1,13 @@
 #!/bin/bash
 #take username and password
-declare -A users;
+user1=""
+user2=""
 login_user () {
     read -p "Enter user $1's username: " usr;
     read -sp "Enter user $1's password: " psd;
     echo ""
-    declare -A tsvd_usr;
-    declare -A tsvd_psd;
+    declare -a tsvd_usr;
+    declare -a tsvd_psd;
     index=0;
     while IFS=$'\t' read -r usr_i psd_i; do
         tsvd_usr[$index]="$usr_i";
@@ -25,7 +26,7 @@ login_user () {
         echo "Username and password cannot be empty. Please try again."
         login_user $1
     fi
-    if [ "$1" == "2" ] && [ ${users["user1"]} == "$usr" ]; then
+if [ "$1" == "2" ] && [ "$user1" == "$usr" ]; then
         echo "User $1: $usr is already logged in. Please use a different username."
         login_user $1
     fi
@@ -39,7 +40,7 @@ login_user () {
     else
         if [ "$(hash_pass "$psd")" == "$ps_f" ]; then
             echo "User $1: $usr has been successfully logged in."
-            users["user$1"]=$usr;
+            if [ "$1" == "1" ]; then user1=$usr; else user2=$usr; fi
             return 1
         else
             echo "Incorrect password. Please try again."
@@ -63,7 +64,7 @@ register_user () {
     if [ $us_f -eq 0 ]; then
         echo -e "$usr_n\t$(hash_pass "$psd_n")" >> users.tsv
         echo "User $1: $usr_n has been successfully registered and logged in."
-        users["user$1"]=$usr_n;
+        if [ "$1" == "1" ]; then user1=$usr_n; else user2=$usr_n; fi
     else
         echo "Given username already exists. Please use a different username."
         register_user $1
@@ -77,5 +78,5 @@ hash_pass () {
 
 login_user 1
 login_user 2
-echo "Authentication of user 1: ${users["user1"]} and user 2: ${users["user2"]} is successful. You can now continue with the game hub."
-python3 game.py ${users["user1"]} ${users["user2"]}
+echo "Authentication of user 1: $user1 and user 2: $user2 is successful. You can now continue with the game hub."
+python3 game.py $user1 $user2
