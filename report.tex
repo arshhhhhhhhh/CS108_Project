@@ -1,0 +1,83 @@
+\documentclass[12pt]{article}
+
+\bibliographystyle{IEEEtran}
+
+\title{CS108 Project Report}
+\author{Upayan Barman, Arshdeep Singh}
+\date{29/04/2026}
+
+\begin{document}
+
+\maketitle
+
+\section{External Libraries Used}
+
+The project utilizes the following external libraries:
+
+\begin{itemize}
+    \item \textbf{Pygame} -- Graphics, windowing, IO \cite{pygamewebsite}
+    \item \textbf{Matplotlib} -- Graphs for game statistics \cite{matplotlibwebsite}
+    \item \textbf{NumPy} -- Numerical computations for individual games \cite{numpywebsite}
+\end{itemize}
+
+\section{Implemented Features}
+
+The project implements the following features:
+
+\begin{itemize}
+    \item \textbf{Authentication} -- 2 Players, as games are 1v1
+    \item \textbf{Game with Mouse Input} -- Othello, Tic-tac-toe, and Connect-4
+    \item \textbf{Game Statistics} -- Wins, Losses and Win/Loss Ratio by player for each game
+\end{itemize}
+
+\section{Code Logic Explanation}
+
+\subsection{Authentication Logic}
+\begin{itemize}
+    \item Validates user input (username, password format) from users.tsv file
+    \item Hashes passwords using SHA256 before storage \cite{sha256wiki}
+    \item Compares hashed passwords during login verification
+    \item Prompts for new user creation if user doesn't exist
+    \item Implements error checking for already existing users on register or incorrect password on login
+\end{itemize}
+
+\subsection{Game Loop Logic}
+\begin{itemize}
+    \item \textbf{Initialize:} Load game assets and set initial state
+    \item \textbf{Event Processing:} Handle user input (keyboard, mouse)
+    \item \textbf{Update:} Process individual game logic and state changes (turns)
+    \item \textbf{Render:} Draw current frame to display
+    \item \textbf{Loop:} Repeat at fixed maximum frame rate
+\end{itemize}
+
+\subsection{Leaderboard Logic}
+\begin{itemize}
+    \item Records player scores after game completion
+    \item Sorts players by highest wins/losses/win-loss ratio in descending order
+    \item Displays charts for visualisation using Matplotlib \cite{matplotlibwebsite}
+\end{itemize}
+
+\subsection{Game-Specific Logic}
+Each game implements its own logic module (while avoiding loop-based checking using NumPy) with:
+\begin{itemize}
+    \item Input handling specific to game board
+    \item Collision detection
+    \item Win/lose/draw condition checking
+    \item Valid/invalid moves checking
+\end{itemize}
+
+\section{Hurdles Faced}
+During making of individual game logic we had significant trouble in implementing loopless logic. We used NumPy \cite{numpywebsite} for that.
+
+\section{What you would do differently with 10 more hours}
+We would add the features of:
+\begin{itemize}
+    \item Animated transitions between menus and games
+    \item Sounds and background music for adjustable volumes
+    \item Animated backgrounds for menus and games
+    \item More games
+\end{itemize}
+
+\bibliography{report}  
+
+\end{document}
