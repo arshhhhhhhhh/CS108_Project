@@ -1,18 +1,14 @@
-MAIN = report
+REPORT = report
+TEX = pdflatex
 
-LATEX = pdflatex
-BIBTEX = bibtex
-
-all: $(MAIN).pdf
-
-$(MAIN).pdf: $(MAIN).tex $(MAIN).bib
-	$(LATEX) $(MAIN).tex
-	$(BIBTEX) $(MAIN)
-	$(LATEX) $(MAIN).tex
-	$(LATEX) $(MAIN).tex
+all:
+	$(TEX) $(REPORT).tex
+	$(TEX) $(REPORT).tex
 
 clean:
-	rm -f *.aux *.bbl *.blg *.log *.out *.toc
+	rm -f *.aux *.log *.out *.toc *.lof *.lot *.fls *.fdb_latexmk *.synctex.gz
 
-distclean: clean
-	rm -f $(MAIN).pdf
+fresh: clean all
+
+open: all
+	open $(REPORT).pdf
