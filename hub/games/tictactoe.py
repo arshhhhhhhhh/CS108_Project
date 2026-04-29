@@ -10,6 +10,7 @@ class tictactoe(Game):
         self.set_game(screen)
     
     def set_game(self, screen):
+        #load assets and initialize game variables
         self.load_assets(screen)
         self.pieces = {1: 0, 2: 0}
         self.grid = [
@@ -22,8 +23,6 @@ class tictactoe(Game):
         self.o_image = pygame.image.load('images/tictactoe/nought.png').convert_alpha()
         self.piece_images = {1: self.x_image, 2: self.o_image}
         self.tictactoe_bg = pygame.image.load('images/tictactoe/bg.png').convert()
-        self.reset_button = pygame.Rect(60, 749, 286, 61)
-        self.main_menu_button = pygame.Rect(1124, 749, 286, 61)
         self.win_h = pygame.image.load('images/tictactoe/h.png').convert_alpha()
         self.win_v = pygame.image.load('images/tictactoe/v.png').convert_alpha()
         self.win_d1 = pygame.image.load('images/tictactoe/d1.png').convert_alpha()
@@ -34,12 +33,12 @@ class tictactoe(Game):
         self.d2_rect = self.win_d2.get_rect()
 
     def check_win(self, r, c):
-        #draw
+        #check draw
         if self.pieces[1]+self.pieces[2]==100:
             self.result = 0
             return
         b = (self.board == self.next_player).astype(int)
-        #horizontal
+        #check horizontal
         row = b[r, :]
         windows = sliding_window_view(row, 5)
         sums = windows.sum(axis=1)
@@ -48,7 +47,7 @@ class tictactoe(Game):
             self.win_type = "h"
             self.result = self.next_player
             return
-        #vertical
+        #check vertical
         col = b[:, c]
         windows = sliding_window_view(col, 5)
         sums = windows.sum(axis=1)
@@ -57,7 +56,7 @@ class tictactoe(Game):
             self.win_type = "v"
             self.result = self.next_player
             return
-        #diagonal1
+        #check diagonal1
         diag1 = np.diagonal(b, offset=c-r)
         if len(diag1) >= 5:
             windows = sliding_window_view(diag1, 5)
@@ -71,7 +70,7 @@ class tictactoe(Game):
                 self.win_type = "d1"
                 self.result = self.next_player
                 return
-        #diagonal2
+        #check diagonal2
         diag2 = np.diagonal(np.fliplr(b), offset=(9-c)-r)
         if len(diag2) >= 5:
             windows = sliding_window_view(diag2, 5)
@@ -88,6 +87,7 @@ class tictactoe(Game):
                 return
 
     def update_board(self, r, c):
+        #update the board with the current player's move if the cell is empty and switch turns
         if self.board[r][c] == 0:
             self.board[r][c] = self.current_player
             self.pieces[self.current_player] += 1
@@ -97,21 +97,24 @@ class tictactoe(Game):
             return False
     
     def draw_board(self):
+        #display the board and pieces on the screen
         self.screen.blit(self.tictactoe_bg, (0, 0))
         for r in range(10):
             for c in range(10):
                 if self.board[r][c] != 0:
                     self.screen.blit(self.piece_images[self.board[r][c]], self.grid[r][c])
+        
+        #display current turn or result
         if self.result == -1:
             self.screen.blit(self.turn_images[self.current_player], (0, 0))
         else:
             self.screen.blit(self.result_images[self.result], (0, 0))
-        p1_count_str = f"{self.pieces[1]:02d}"
-        p2_count_str = f"{self.pieces[2]:02d}"
+        
+        #display player names and piece counts
         p1_name = self.name_font.render(self.player1.upper(), True, (255, 255, 255))
         p2_name = self.name_font.render(self.player2.upper(), True, (255, 255, 255))
-        p1_count = self.count_font.render(p1_count_str, True, (255, 255, 255))
-        p2_count = self.count_font.render(p2_count_str, True, (255, 255, 255))
+        p1_count = self.count_font.render(f"{self.pieces[1]:02d}", True, (255, 255, 255))
+        p2_count = self.count_font.render(f"{self.pieces[2]:02d}", True, (255, 255, 255))
         p1_name_rect = p1_name.get_rect()
         p2_name_rect = p2_name.get_rect()
         p1_count_rect = p1_count.get_rect()
@@ -124,6 +127,8 @@ class tictactoe(Game):
         self.screen.blit(p2_name, p2_name_rect)
         self.screen.blit(p1_count, p1_count_rect)
         self.screen.blit(p2_count, p2_count_rect)
+
+        #display winning line if there is a winner
         if self.win_cell != None:
             (r,c) = self.win_cell
             x = 437+c*60
@@ -142,6 +147,7 @@ class tictactoe(Game):
                 self.screen.blit(self.win_d2, self.d2_rect)
 
     def get_clicked_cell(self, pos):
+        #return the cell corresponding to the position of mouse click
         for i in range(10):
             for j in range(10):
                 if self.grid[i][j].collidepoint(pos):
@@ -149,6 +155,7 @@ class tictactoe(Game):
         return None
         
     def start_tictactoe(self):
+        #main game loop to handle events and update the screen accordingly
         clock = pygame.time.Clock()
         while True:
             for event in pygame.event.get():

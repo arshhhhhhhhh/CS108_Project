@@ -10,12 +10,14 @@ class othello(Game):
         self.update_valid_pos()
     
     def set_board(self, screen):
+        #Initial board setup and loading assets
         self.board[3][3] = 2
         self.board[3][4] = 1
         self.board[4][3] = 1
         self.board[4][4] = 2
         self.player1_pieces = 2
         self.player2_pieces = 2
+        self.turn_pass = 0
         self.load_assets(screen)
         self.grid = [
             [pygame.Rect(col*75 + 437, row*75 + 225, 75, 75) for col in range(8)]
@@ -25,16 +27,16 @@ class othello(Game):
         self.white_disc = pygame.image.load('images/othello/white.png').convert_alpha()
         self.discs = {1: self.black_disc, 2: self.white_disc}
         self.othello_bg = pygame.image.load('images/othello/bg.png').convert()
-        self.reset_button = pygame.Rect(60, 749, 286, 61)
-        self.main_menu_button = pygame.Rect(1124, 749, 286, 61)
-
+        
     def update_valid_pos(self):
+        #Calculate valid moves for the current player and store them in a set
         self.valid_moves = set()
         for i in range(8):
             for j in range(8):
                 if self.board[i][j] != self.current_player:
                     continue
                 for c in range(8):
+                    #Check horizontal
                     if self.board[i][c] != 0 or c == j or j-c == 1 or j-c == -1:
                         continue
                     value = 1
@@ -43,8 +45,9 @@ class othello(Game):
                             value = 0
                             break
                     if value == 1:
-                        self.valid_moves.add(((i, c), (i, j), "horizontal"))
+                        self.valid_moves.add(((i, c), (i, j)))
                 for r in range(8):
+                    #Check vertical
                     if self.board[r][j] != 0 or r == i or r-i == 1 or r-i == -1:
                         continue
                     value = 1
@@ -53,8 +56,9 @@ class othello(Game):
                             value = 0
                             break
                     if value == 1:
-                        self.valid_moves.add(((r, j), (i, j), "vertical"))
+                        self.valid_moves.add(((r, j), (i, j)))
                 for t in range(-7, 8):
+                    #Check diagonal1
                     if i+t < 0 or i+t > 7 or j+t < 0 or j+t > 7 or t == 0 or t == 1 or t == -1:
                         continue
                     if self.board[i+t][j+t] != 0:
@@ -65,8 +69,9 @@ class othello(Game):
                             value = 0
                             break
                     if value == 1:
-                        self.valid_moves.add(((i+t, j+t), (i, j), "diagonal1"))
+                        self.valid_moves.add(((i+t, j+t), (i, j)))
                 for t in range(-7, 8):
+                    #Check diagonal2
                     if i+t < 0 or i+t > 7 or j-t < 0 or j-t > 7 or t == 0 or t == 1 or t == -1:
                         continue
                     if self.board[i+t][j-t] != 0:
@@ -77,9 +82,10 @@ class othello(Game):
                             value = 0
                             break
                     if value == 1:
-                        self.valid_moves.add(((i+t, j-t), (i, j), "diagonal2"))
+                        self.valid_moves.add(((i+t, j-t), (i, j)))
         
     def check_valid_move(self, r, c):
+        #Check if the move is valid and return the list of pieces which correspond to the move
         moves = []
         for move in self.valid_moves:
             if move[0] == (r, c):
@@ -87,6 +93,7 @@ class othello(Game):
         return moves         
 
     def update_board(self, r, c):
+        #update the board based on the move and flip the pieces accordingly. Also update the piece counts for both players
         if len(self.check_valid_move(r, c)) == 0:
             return 0
         for move in self.check_valid_move(r, c):
@@ -109,10 +116,12 @@ class othello(Game):
                         self.player2_pieces += 1
         self.switch_turn()
         self.update_valid_pos()
-        #print(self.valid_moves)
+        if self.turn_pass == 1:
+            self.turn_pass = 0
         return 1
 
     def check_win(self):
+        #check win when the board is full
         if self.player1_pieces + self.player2_pieces == 64:
             if self.player1_pieces > self.player2_pieces:
                 self.result = 1
@@ -124,6 +133,7 @@ class othello(Game):
                 self.result = 0
                 return 0
 
+        #check win when a player has no pieces left
         if self.current_player == 1 and self.player1_pieces == 0:
             self.result = 2
             return 2
@@ -131,6 +141,7 @@ class othello(Game):
             self.result = 1
             return 1
 
+        #check win when a player has no valid moves left
         if len(self.valid_moves) == 0:
             self.switch_turn()
             self.update_valid_pos()
@@ -144,30 +155,34 @@ class othello(Game):
                 else:
                     self.result = 0
                     return 0
-            #self.switch_turn()
-            #self.update_valid_pos()
+            self.switch_turn()
+            self.update_valid_pos()
         return -1
     
     def draw_board(self):
+        #display the board and pieces on the screen
         self.screen.blit(self.othello_bg, (0, 0))
         for i in range(8):
             for j in range(8):
                 if self.board[i][j] != 0:
                     self.screen.blit(self.discs[self.board[i][j]], self.grid[i][j])
+        
+        #display current turn, result or turn skip messsage
         if self.result == -1:
             self.screen.blit(self.turn_images[self.current_player], (0, 0))
+            if self.turn_pass == 1:
+                turn_pass = self.name_font.render("No Valid Moves", True, (255, 255, 255))
+                turn_pass_rect = turn_pass.get_rect()
+                turn_pass_rect.center = (600*(self.next_player-1)+217*(2*self.next_player-1), 225)
+                self.screen.blit(turn_pass, turn_pass_rect)
         else:
             self.screen.blit(self.result_images[self.result], (0, 0))
-        p1_count_str = f"{self.player1_pieces}"
-        p2_count_str = f"{self.player2_pieces}"
-        if self.player1_pieces < 10:
-            p1_count_str = "0" + p1_count_str
-        if self.player2_pieces < 10:
-            p2_count_str = "0" + p2_count_str
+        
+        #display player names and piece counts
         p1_name = self.name_font.render(self.player1.upper(), True, (255, 255, 255))
         p2_name = self.name_font.render(self.player2.upper(), True, (255, 255, 255))
-        p1_count = self.count_font.render(p1_count_str, True, (255, 255, 255))
-        p2_count = self.count_font.render(p2_count_str, True, (255, 255, 255))
+        p1_count = self.count_font.render(f"{self.player1_pieces:02d}", True, (255, 255, 255))
+        p2_count = self.count_font.render(f"{self.player2_pieces:02d}", True, (255, 255, 255))
         p1_name_rect = p1_name.get_rect()
         p2_name_rect = p2_name.get_rect()
         p1_count_rect = p1_count.get_rect()
@@ -182,6 +197,7 @@ class othello(Game):
         self.screen.blit(p2_count, p2_count_rect)
     
     def get_clicked_cell(self, pos):
+        #return the cell corresponding to the position of mouse click
         for i in range(8):
             for j in range(8):
                 if self.grid[i][j].collidepoint(pos):
@@ -189,6 +205,7 @@ class othello(Game):
         return None
     
     def start_othello(self):
+        #main game loop to handle events and update the screen accordingly
         clock = pygame.time.Clock()
         while True:
             for event in pygame.event.get():
@@ -212,6 +229,10 @@ class othello(Game):
                         r, c = cell
                         if self.update_board(r, c) == 1:
                             self.check_win()
+                            if len(self.valid_moves) == 0:
+                                self.switch_turn()
+                                self.update_valid_pos()
+                                self.turn_pass = 1
             
             self.draw_board()
             cell = self.get_clicked_cell(pygame.mouse.get_pos())

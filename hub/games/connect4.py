@@ -10,6 +10,7 @@ class connect4(Game):
         self.set_game(screen)
     
     def set_game(self, screen):
+        #load assets and initialize game variables
         self.load_assets(screen)
         self.pieces = {1: 0, 2: 0}
         self.grid = [
@@ -22,8 +23,6 @@ class connect4(Game):
         self.pink_disc = pygame.image.load('images/connect4/pink.png').convert_alpha()
         self.discs = {1: self.blue_disc, 2: self.pink_disc}
         self.connect4_bg = pygame.image.load('images/connect4/bg.png').convert()
-        self.reset_button = pygame.Rect(60, 749, 286, 61)
-        self.main_menu_button = pygame.Rect(1124, 749, 286, 61)
         self.win_h = pygame.image.load('images/connect4/h.png').convert_alpha()
         self.win_v = pygame.image.load('images/connect4/v.png').convert_alpha()
         self.win_d1 = pygame.image.load('images/connect4/d1.png').convert_alpha()
@@ -34,12 +33,12 @@ class connect4(Game):
         self.d2_rect = self.win_d2.get_rect()
 
     def check_win(self, r, c):
-        #draw
+        #check for draw
         if self.pieces[1]+self.pieces[2]==49:
             self.result = 0
             return
         b = (self.board == self.next_player).astype(int)
-        #horizontal
+        #check horizontal
         row = b[r, :]
         windows = sliding_window_view(row, 4)
         sums = windows.sum(axis=1)
@@ -48,7 +47,7 @@ class connect4(Game):
             self.win_type = "h"
             self.result = self.next_player
             return
-        #vertical
+        #check vertical
         col = b[:, c]
         windows = sliding_window_view(col, 4)
         sums = windows.sum(axis=1)
@@ -57,7 +56,7 @@ class connect4(Game):
             self.win_type = "v"
             self.result = self.next_player
             return
-        #diagonal1
+        #check diagonal1
         diag1 = np.diagonal(b, offset=c-r)
         if len(diag1) >= 4:
             windows = sliding_window_view(diag1, 4)
@@ -71,7 +70,7 @@ class connect4(Game):
                 self.win_type = "d1"
                 self.result = self.next_player
                 return
-        #diagonal2
+        #check diagonal2
         diag2 = np.diagonal(np.fliplr(b), offset=(6-c)-r)
         if len(diag2) >= 4:
             windows = sliding_window_view(diag2, 4)
@@ -87,6 +86,7 @@ class connect4(Game):
                 return
 
     def get_lowest(self, c):
+        #return the lowest empty row in the specified column, or None if the column is full
         if c is None:
             return None
         for r in range(6, -1, -1):
@@ -95,6 +95,7 @@ class connect4(Game):
         return None
     
     def update_board(self, c):
+        #update the board with the current player's move in the specified column if possible and switch turns
         r = self.get_lowest(c)
         if r != None:
             self.board[r][c] = self.current_player
@@ -105,15 +106,20 @@ class connect4(Game):
             return False
         
     def draw_board(self):
+        #display the board and pieces on the screen
         self.screen.blit(self.connect4_bg, (0, 0))
         for r in range(7):
             for c in range(7):
                 if self.board[r][c] != 0:
                     self.screen.blit(self.discs[self.board[r][c]], self.grid[r][c])
+        
+        #display current turn or result
         if self.result == -1:
             self.screen.blit(self.turn_images[self.current_player], (0, 0))
         else:
             self.screen.blit(self.result_images[self.result], (0, 0))
+        
+        #display player names and piece counts
         p1_count_str = f"{self.pieces[1]:02d}"
         p2_count_str = f"{self.pieces[2]:02d}"
         p1_name = self.name_font.render(self.player1.upper(), True, (255, 255, 255))
@@ -132,6 +138,8 @@ class connect4(Game):
         self.screen.blit(p2_name, p2_name_rect)
         self.screen.blit(p1_count, p1_count_rect)
         self.screen.blit(p2_count, p2_count_rect)
+        
+        #display winning line if there is a winner
         if self.win_cell != None:
             (r,c) = self.win_cell
             x = 434+c*86
@@ -150,6 +158,7 @@ class connect4(Game):
                 self.screen.blit(self.win_d2, self.d2_rect)
 
     def get_column(self, pos):
+        #return the column corresponding to the position of mouse click
         for r in range(7):
             for c in range(7):
                 if self.grid[r][c].collidepoint(pos):
@@ -157,6 +166,7 @@ class connect4(Game):
         return None
     
     def start_connect4(self):
+        #main game loop to handle events and update the screen accordingly
         clock = pygame.time.Clock()
         while True:
             for event in pygame.event.get():
@@ -180,7 +190,6 @@ class connect4(Game):
                         row = self.get_lowest(col)
                         if col is not None:
                             if self.update_board(col):
-                                #print(self.board)
                                 self.check_win(row, col)
             self.draw_board()
             col = self.get_column(pygame.mouse.get_pos())
